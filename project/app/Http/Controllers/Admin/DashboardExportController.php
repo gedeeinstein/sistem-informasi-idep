@@ -11,8 +11,21 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpWord\PhpWord;
 
+/**
+ * Class DashboardExportController
+ *
+ * Handles the export of dashboard data to PDF or DOCX.
+ *
+ * @package App\Http\Controllers\Admin
+ */
 class DashboardExportController extends Controller
 {
+    /**
+     * Export dashboard data.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function export(Request $request)
     {
         $format = strtolower($request->input('format', 'pdf'));

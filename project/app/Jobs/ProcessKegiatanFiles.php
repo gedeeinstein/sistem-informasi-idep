@@ -9,16 +9,53 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+/**
+ * Class ProcessKegiatanFiles
+ *
+ * Job to process and attach files to a Kegiatan (Activity) model.
+ *
+ * @package App\Jobs
+ */
 class ProcessKegiatanFiles implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * The Kegiatan instance.
+     *
+     * @var \App\Models\Kegiatan
+     */
     protected $kegiatan;
+
+    /**
+     * The paths of the files to process.
+     *
+     * @var array
+     */
     protected $filePaths;
+
+    /**
+     * The captions for the files.
+     *
+     * @var array
+     */
     protected $captions;
+
+    /**
+     * The collection names for the files.
+     *
+     * @var array
+     */
     protected $collectionNames;
+
     /**
      * Create a new job instance.
+     *
+     * @param  \App\Models\Kegiatan  $kegiatan
+     * @param  array  $filePaths
+     * @param  array  $captions
+     * @param  array  $collectionNames
+     * @return void
      */
     public function __construct(Kegiatan $kegiatan, array $filePaths, array $captions, array $collectionNames)
     {
@@ -30,6 +67,8 @@ class ProcessKegiatanFiles implements ShouldQueue
 
     /**
      * Execute the job.
+     *
+     * @return void
      */
         public function handle()
     {

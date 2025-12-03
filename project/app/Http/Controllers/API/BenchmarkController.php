@@ -27,11 +27,21 @@ use App\Http\Requests\UpdateBenchmarkRequest;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * Class BenchmarkController
+ *
+ * API Controller for managing quality benchmarks.
+ *
+ * @package App\Http\Controllers\API
+ */
 class BenchmarkController extends Controller
 {
     /**
      * Tampilkan list benchmark dengan filter program.
      * Data benchmark diambil dari table trmealsqb.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getBenchmarkDatatable(Request $request)
     {
@@ -76,6 +86,9 @@ class BenchmarkController extends Controller
     /**
      * Simpan benchmark baru.
      * Semua input divalidasi melalui BenchmarkRequest.
+     *
+     * @param  \App\Http\Requests\StoreBenchmarkRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function storeBenchmark(StoreBenchmarkRequest $request)
     {
@@ -114,6 +127,9 @@ class BenchmarkController extends Controller
 
     /**
      * Lookup compiler (data user) untuk dropdown compiler.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getCompilers(Request $request)
     {
@@ -143,6 +159,9 @@ class BenchmarkController extends Controller
     /**
      * Lookup program dari table trprogram.
      * Dilengkapi relasi output dan activities untuk filter (seperti di transaksi kegiatan).
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getPrograms(Request $request)
     {
@@ -187,6 +206,9 @@ class BenchmarkController extends Controller
 
     /**
      * Lookup jenis kegiatan untuk dropdown.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getJenisKegiatan(Request $request)
     {
@@ -209,6 +231,9 @@ class BenchmarkController extends Controller
     /**
      * Lookup kegiatan berdasarkan program_id dan jenis_kegiatan_id.
      * Dipakai untuk form benchmark ketika memilih kegiatan.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getKegiatan(Request $request)
     {
@@ -238,6 +263,12 @@ class BenchmarkController extends Controller
         return response()->json($data);
     }
 
+    /**
+     * Lookup lokasi (desa, kecamatan, kabupaten, provinsi) berdasarkan kegiatan_id.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getLokasi(Request $request)
     {
         $kegiatanId = $request->kegiatan_id;
@@ -263,6 +294,13 @@ class BenchmarkController extends Controller
     }
 
 
+    /**
+     * Update benchmark.
+     *
+     * @param  \App\Http\Requests\UpdateBenchmarkRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateBenchmark(UpdateBenchmarkRequest $request, $id)
     {
         try {
@@ -312,7 +350,16 @@ class BenchmarkController extends Controller
     }
 
 
-    // Metode tambahan untuk generate tombol aksi, misalnya edit & view
+    /**
+     * Metode tambahan untuk generate tombol aksi, misalnya edit & view.
+     *
+     * @param  string  $type
+     * @param  string  $btnClass
+     * @param  string  $icon
+     * @param  string  $title
+     * @param  mixed  $id
+     * @return string
+     */
     protected function generateButton($type, $btnClass, $icon, $title, $id)
     {
         return "<button type='button' class='btn btn-{$btnClass} btn-{$type}' data-id='{$id}' title='{$title}'><i class='bi bi-{$icon}'></i></button>";

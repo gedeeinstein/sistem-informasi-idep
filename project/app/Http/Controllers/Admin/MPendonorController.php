@@ -13,10 +13,19 @@ use App\Http\Requests\StoreMpendonorRequest;
 use App\Http\Requests\UpdateMpendonorRequest;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Class MPendonorController
+ *
+ * Controller for managing Master Pendonor (Donors).
+ *
+ * @package App\Http\Controllers\Admin
+ */
 class MPendonorController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -25,6 +34,8 @@ class MPendonorController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create()
     {
@@ -34,6 +45,9 @@ class MPendonorController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreMpendonorRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreMpendonorRequest $request)
     {
@@ -83,6 +97,9 @@ class MPendonorController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @param  \App\Models\MPendonor  $pendonor
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(MPendonor $pendonor)
     {
@@ -94,6 +111,9 @@ class MPendonorController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\MPendonor  $pendonor
+     * @return array
      */
     public function edit(MPendonor $pendonor)
     {
@@ -104,6 +124,10 @@ class MPendonorController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateMpendonorRequest  $request
+     * @param  \App\Models\MPendonor  $pendonor
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateMpendonorRequest $request, MPendonor $pendonor)
     {
@@ -147,6 +171,9 @@ class MPendonorController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param  string  $id
+     * @return \Illuminate\Http\Response
      */
     public function destroy(string $id)
     {
@@ -159,6 +186,11 @@ class MPendonorController extends Controller
     //     return $data;
     // }
 
+    /**
+     * Get data for datatable.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function datapendonor(){
         $pendonor = MPendonor::with('mpendonnorkategori')->get();
         // Prepare data for DataTables (without modifying original collection)

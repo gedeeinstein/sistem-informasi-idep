@@ -16,16 +16,34 @@ use App\Models\Meals_Target_Progress;
 use App\Models\Meals_Komponen_Model_Lokasi;
 use Carbon\Carbon;
 
+/**
+ * Class MealsDashboardController
+ *
+ * Handles the MEALS dashboard logic.
+ *
+ * @package App\Http\Controllers
+ */
 class MealsDashboardController extends Controller
 {
 
-
+    /**
+     * Filter dashboard data based on request parameters.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function filterDashboardData(Request $request)
     {
         $data = $this->getDashboardData($request);
         return response()->json($data);
     }
 
+    /**
+     * Get the dashboard data.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
     private function getDashboardData(Request $request)
     {
         $programId = $request->input('program_id');
@@ -173,11 +191,23 @@ class MealsDashboardController extends Controller
         );
     }
 
+    /**
+     * Export dashboard data to PDF (Dummy action).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function exportPdf()
     {
         // In a real application, you would generate and return a PDF
         return response()->json(['message' => 'PDF export initiated (dummy action)']);
     }
+
+    /**
+     * Display the MEALS dashboard index page.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
         // Initial Data Load

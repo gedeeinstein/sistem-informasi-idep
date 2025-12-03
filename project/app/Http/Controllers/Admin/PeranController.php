@@ -10,10 +10,19 @@ use Illuminate\Database\QueryException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Class PeranController
+ *
+ * Controller for managing Peran (Roles/Types).
+ *
+ * @package App\Http\Controllers\Admin
+ */
 class PeranController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -23,6 +32,8 @@ class PeranController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     *
+     * @return void
      */
     public function create()
     {
@@ -31,6 +42,9 @@ class PeranController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -63,6 +77,9 @@ class PeranController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @param  \App\Models\Peran  $peran
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Peran $peran)
     {
@@ -71,6 +88,9 @@ class PeranController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Peran  $peran
+     * @return \Illuminate\Http\JsonResponse
      */
     public function edit(Peran $peran)
     {
@@ -79,6 +99,10 @@ class PeranController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Peran  $peran
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, Peran $peran)
     {
@@ -102,12 +126,20 @@ class PeranController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param  string  $id
+     * @return void
      */
     public function destroy(string $id)
     {
         //
     }
 
+    /**
+     * Get data for datatable.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getData()
     {
         $perans = Peran::get();

@@ -5,6 +5,13 @@ namespace App\Services\MediaLibrary;
 use \Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\Support\PathGenerator\PathGenerator as BasePathGenerator;
 
+/**
+ * Class CustomPathGenerator
+ *
+ * Custom path generator for media library.
+ *
+ * @package App\Services\MediaLibrary
+ */
 class CustomPathGenerator implements BasePathGenerator
 {
     /**

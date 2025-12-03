@@ -19,15 +19,35 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\ProcessProgramFiles;
 
+/**
+ * Class TrProgramController
+ *
+ * Controller for managing Programs (Transactional).
+ *
+ * @package App\Http\Controllers\Admin
+ */
 class TrProgramController extends Controller
 {
     use MediaUploadingTrait;
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
 
         return view('tr.program.index');
     }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
 
@@ -37,6 +57,12 @@ class TrProgramController extends Controller
         }
         abort(Response::HTTP_FORBIDDEN, 'Unauthorized Permission. Please ask your administrator to assign permissions to access and create a program');
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @return \Illuminate\View\View
+     */
     public function show()
     {
 
@@ -46,7 +72,14 @@ class TrProgramController extends Controller
         }
         abort(Response::HTTP_FORBIDDEN, 'Unauthorized Permission. Please ask your administrator to assign permissions to access and edit Program');
     }
-    // STORE DATA
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreProgramRequest  $request
+     * @param  \App\Models\Program  $program
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(StoreProgramRequest $request, Program $program)
     {
         try {

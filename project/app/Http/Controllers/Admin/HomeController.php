@@ -4,6 +4,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+/**
+ * Class HomeController
+ *
+ * Controller for the admin home dashboard.
+ *
+ * @package App\Http\Controllers\Admin
+ */
 class HomeController extends Controller
 {
     /**

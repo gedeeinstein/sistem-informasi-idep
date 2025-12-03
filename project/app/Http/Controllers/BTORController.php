@@ -9,10 +9,20 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\BTORExport;
 
+/**
+ * Class BTORController
+ *
+ * Handles requests related to Back To Office Reports (BTOR).
+ *
+ * @package App\Http\Controllers
+ */
 class BTORController extends Controller
 {
     /**
-     * Display a listing of BTOR reports
+     * Display a listing of BTOR reports.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -34,7 +44,10 @@ class BTORController extends Controller
     }
 
     /**
-     * Display the specified BTOR report
+     * Display the specified BTOR report.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
      */
     public function show($id)
     {
@@ -44,6 +57,12 @@ class BTORController extends Controller
         return view('tr.btor.show', compact('kegiatan', 'viewPath'));
     }
 
+    /**
+     * Display the print view for the specified BTOR report.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
+     */
     public function print($id)
     {
         $kegiatan = BTOR::getData($id);
@@ -53,6 +72,13 @@ class BTORController extends Controller
         return view('tr.btor.print', compact('kegiatan', 'viewPath', 'showButtons'));
     }
 
+    /**
+     * Export the BTOR report to PDF.
+     *
+     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function exportPdf($id, Request $request)
     {
         $kegiatan = BTOR::getData($id);
@@ -75,10 +101,11 @@ class BTORController extends Controller
         return $pdf->download($filename);
     }
 
-
-
     /**
-     * Export to PDF
+     * Export to PDF (Old version).
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
     public function exportPdfOld($id)
     {
@@ -98,7 +125,10 @@ class BTORController extends Controller
     }
 
     /**
-     * Export to Excel
+     * Export filtered reports to Excel.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function exportExcel(Request $request)
     {
@@ -116,7 +146,10 @@ class BTORController extends Controller
     }
 
     /**
-     * Export multiple reports to ZIP
+     * Export multiple reports to ZIP.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function exportBulkPdf(Request $request)
     {
@@ -155,7 +188,11 @@ class BTORController extends Controller
     }
 
     /**
-     * Export to PDF
+     * Export to PDF (Version 2).
+     *
+     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function exportPdf2($id, Request $request)
     {
@@ -183,9 +220,10 @@ class BTORController extends Controller
         return $pdf->download($filename);
     }
 
-
     /**
-     * Show export configuration page
+     * Show export configuration page.
+     *
+     * @return \Illuminate\View\View
      */
     public function exportConfig()
     {

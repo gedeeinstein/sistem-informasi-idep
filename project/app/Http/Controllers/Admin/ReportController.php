@@ -7,13 +7,31 @@ use App\Models\Jenis_Kegiatan;
 use App\Models\Program;
 use Illuminate\Http\Request;
 
+/**
+ * Class ReportController
+ *
+ * Controller for generating reports.
+ *
+ * @package App\Http\Controllers\Admin
+ */
 class ReportController extends Controller
 {
+    /**
+     * Display the report generation page.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         return view('report.report-idep');
     }
 
+    /**
+     * Generate the report based on request parameters.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function generate(Request $request)
     {
         $validated = $request->validate([
@@ -63,6 +81,13 @@ class ReportController extends Controller
         ]);
     }
 
+    /**
+     * Build the report data based on type.
+     *
+     * @param  string  $type
+     * @param  array  $filters
+     * @return array
+     */
     private function buildReport(string $type, array $filters): array
     {
         if ($type === 'kegiatan') {
@@ -74,6 +99,12 @@ class ReportController extends Controller
         return $this->buildMealsReport($filters);
     }
 
+    /**
+     * Build the Kegiatan report data.
+     *
+     * @param  array  $filters
+     * @return array
+     */
     private function buildKegiatanReport(array $filters): array
     {
         $query = \App\Models\Kegiatan::with([
@@ -134,6 +165,12 @@ class ReportController extends Controller
         return [$headings, $rows, 'Laporan Kegiatan'];
     }
 
+    /**
+     * Build the Program report data.
+     *
+     * @param  array  $filters
+     * @return array
+     */
     private function buildProgramReport(array $filters): array
     {
         $programId = $filters['program_id'] ?? null;
@@ -174,6 +211,12 @@ class ReportController extends Controller
         return [$headings, $rows, 'Laporan Program'];
     }
 
+    /**
+     * Build the MEALS report data.
+     *
+     * @param  array  $filters
+     * @return array
+     */
     private function buildMealsReport(array $filters): array
     {
         $programId = $filters['program_id'] ?? null;
@@ -219,7 +262,12 @@ class ReportController extends Controller
         return [$headings, $rows, 'Laporan MEALS - Komponen Model'];
     }
 
-    // Simple Select2-friendly program list
+    /**
+     * Get a list of programs for Select2.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getPrograms(Request $request)
     {
         $request->validate([
@@ -258,7 +306,12 @@ class ReportController extends Controller
         ]);
     }
 
-    // Simple Select2-friendly jenis kegiatan list
+    /**
+     * Get a list of activity types for Select2.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getJenisKegiatan(Request $request)
     {
         $request->validate([

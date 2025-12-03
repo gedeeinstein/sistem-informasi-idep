@@ -10,6 +10,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class HomeController
+ *
+ * Handles the dashboard and home page logic.
+ *
+ * @package App\Http\Controllers
+ */
 class HomeController extends Controller
 {
     /**
@@ -44,6 +51,13 @@ class HomeController extends Controller
 
         return view('home', compact('programs', 'provinsis', 'years', 'googleMapsApiKey', 'autoPrint'));
     }
+
+    /**
+     * Get dashboard data for charts and statistics.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     function getDashboardData(Request $request)
     {
         $data = Meals_Penerima_Manfaat::query()
@@ -83,6 +97,12 @@ class HomeController extends Controller
         ]);
     }
 
+    /**
+     * Get data for the villages per province chart.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getDesaPerProvinsiChartData(Request $request)
     {
         $query = Meals_Penerima_Manfaat::with('dusun.desa.kecamatan.kabupaten.provinsi')
@@ -131,6 +151,13 @@ class HomeController extends Controller
         return response()->json($data);
     }
 
+    /**
+     * Get filtered province data with statistics.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int|null  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getFilteredProvinsi(Request $request, $id = null)
     {
         // Build the stats query for beneficiaries and desa, joining through geographic tables
@@ -189,6 +216,13 @@ class HomeController extends Controller
         return response()->json($provinsiList);
     }
 
+    /**
+     * Get combined village map data for visualization.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int|null  $provinsi_id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getCombinedDesaMapData(Request $request, $provinsi_id = null)
     {
         $programId = $request->input('program_id');
@@ -317,52 +351,13 @@ class HomeController extends Controller
 
         return response()->json($desas);
     }
-    // this query is too slow
-    // public function getFilteredProvinsi(Request $request, $id = null)
-    // {
-    //     $programId = $request->program_id;
-    //     $tahun = $request->tahun;
 
-    //     // Build cache key based on filters
-    //     $cacheKey = "provinsi_stats_{$id}_{$programId}_{$tahun}";
-
-    //     $provinsiList = Provinsi::withCount([
-    //         'desa as total_desa' => function ($q) use ($request) {
-    //             if ($request->program_id) {
-    //                 $q->whereHas('penerimaManfaat', function ($qq) use ($request) {
-    //                     $qq->where('program_id', $request->program_id);
-    //                 });
-    //             }
-    //         },
-    //         'penerimaManfaat as total_penerima' => function ($q) use ($request) {
-    //             if ($request->program_id) {
-    //                 $q->where('program_id', $request->program_id);
-    //             }
-
-    //             if ($request->tahun) {
-    //                 $q->whereHas('program', function ($qq) use ($request) {
-    //                     $qq->whereYear('tanggalmulai', '<=', $request->tahun)
-    //                         ->whereYear('tanggalselesai', '>=', $request->tahun);
-    //                 });
-    //             }
-    //         }
-    //     ])->get(); // tanpa ->get([...])
-
-    //     return response()->json(
-    //         $provinsiList->map(function ($prov) {
-    //             return [
-    //                 'id' => $prov->id,
-    //                 'nama' => $prov->nama,
-    //                 'latitude' => $prov->latitude,
-    //                 'longitude' => $prov->longitude,
-    //                 'total_desa' => (int) $prov->total_desa,
-    //                 'total_penerima' => (int) $prov->total_penerima,
-    //             ];
-    //         })->values()
-    //     );
-
-    // }
-
+    /**
+     * Get data for the age group chart.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getAgeGroupChartData(Request $request)
     {
         $query = Meals_Penerima_Manfaat::query();

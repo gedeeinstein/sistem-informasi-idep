@@ -20,8 +20,20 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
+/**
+ * Class KecamatanController
+ *
+ * Controller for managing Kecamatan (Districts).
+ *
+ * @package App\Http\Controllers\Admin
+ */
 class KecamatanController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index(){
         abort_if(Gate::denies('kecamatan_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $kabupaten = Kabupaten::all();
@@ -29,6 +41,12 @@ class KecamatanController extends Controller
         return view("master.kecamatan.index", compact('provinsi'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreKecamatanRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(StoreKecamatanRequest $request){
         // abort_if(Gate::denies('kecamatan_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -73,6 +91,14 @@ class KecamatanController extends Controller
             return response()->json(['status' => $status, 'message' => $message], 419); // Use 500 Internal Server Error for general errors
         }
     }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateKecamatanRequest  $request
+     * @param  \App\Models\Kecamatan  $kecamatan
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(UpdateKecamatanRequest $request, Kecamatan $kecamatan){
         // abort_if(Gate::denies('kecamatan_update'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -94,11 +120,24 @@ class KecamatanController extends Controller
             ],Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Kecamatan  $kecamatan
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show(Kecamatan $kecamatan){
         $kecamatan->load('kabupaten');
         return response()->json($kecamatan); // Return province data as JSON
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Kecamatan  $kecamatan
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function edit(Kecamatan $kecamatan){
         $provinsi = Provinsi::all(['id', 'kode', 'nama']);
         $kabupaten = Kabupaten::where('provinsi_id', $kecamatan->kabupaten->provinsi_id)->get(['id', 'kode', 'nama']);
@@ -113,17 +152,36 @@ class KecamatanController extends Controller
             'provinsi' => $provinsi
         ]);
     }
+
+    /**
+     * Get Kabupaten by Provinsi ID.
+     *
+     * @param  int  $provinsi_id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getKabupatenByProvinsi($provinsi_id) {
         $kabupaten = Kabupaten::where('provinsi_id', $provinsi_id)->get(['id', 'kode', 'nama']);
         return response()->json($kabupaten);
     }
 
 
+    /**
+     * Get all Provinsi.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function provinsi(){
         $provinsi = Provinsi::withActive()->get(['id','kode','nama']);
         return response()->json($provinsi);
 
     }
+
+    /**
+     * Get details of a Provinsi.
+     *
+     * @param  \App\Models\Provinsi  $provinsi
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function provinsi_details(Provinsi $provinsi){
         $provinsi = Provinsi::with('kabupaten_kota:provinsi_id,id,kode,nama,type')
         ->where('id', $provinsi->id)
@@ -131,6 +189,13 @@ class KecamatanController extends Controller
         return response()->json($provinsi);
 
     }
+
+    /**
+     * Get Kabupaten by Provinsi ID from request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function kab(Request $request){
         $kabupaten = Kabupaten::where('provinsi_id', $request->id)
                     ->get(['id', 'kode', 'nama'])
@@ -145,6 +210,12 @@ class KecamatanController extends Controller
         return response()->json($kabupaten);
     }
 
+    /**
+     * Get details of a Kabupaten.
+     *
+     * @param  \App\Models\Kabupaten  $kabupaten
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function kab_details(Kabupaten $kabupaten)
     {
         $kabupaten = Kabupaten::with('kecamatan:kabupaten_id,id,kode,nama')
@@ -153,6 +224,12 @@ class KecamatanController extends Controller
         return response()->json($kabupaten);
     }
 
+    /**
+     * Get Kecamatan by Kabupaten.
+     *
+     * @param  \App\Models\Kabupaten  $kabupaten
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function kec(Kabupaten $kabupaten)
     {
         $kabupaten = Kecamatan::with('kabupaten')->where('kabupaten_id', $kabupaten->id)
@@ -161,6 +238,12 @@ class KecamatanController extends Controller
         return response()->json($kabupaten);
     }
 
+    /**
+     * Get Kecamatan data for Datatable.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function datakecamatan(Request $request){
         if ($request->ajax()) {
             $kecamatan = Kecamatan::with('kabupaten:id,nama,provinsi_id', 'kabupaten.provinsi:nama');
