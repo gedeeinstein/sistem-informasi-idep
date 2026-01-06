@@ -39,9 +39,17 @@ use PHPUnit\Event\Code\Throwable;
 use Yajra\DataTables\Facades\DataTables;
 
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Mews\Purifier\Facades\Purifier;
 
 class KegiatanController extends Controller
 {
+    private const SUMMERNOTE_FIELDS = [
+        'deskripsilatarbelakang',
+        'deskripsitujuan',
+        'deskripsikeluaran',
+        'deskripsiyangdikaji'
+    ];
+
     public function delete_media(Request $request)
     {
         try {
@@ -440,6 +448,14 @@ class KegiatanController extends Controller
         try {
             $user = User::findOrFail($request->user_id);
             $data = $request->validated();
+
+            // Sanitize summernote fields
+            foreach (self::SUMMERNOTE_FIELDS as $field) {
+                if (isset($data[$field])) {
+                    $data[$field] = Purifier::clean($data[$field], 'summernote_clean');
+                }
+            }
+
             DB::beginTransaction();
             $kegiatan = Kegiatan::create($data);
             $kegiatan->mitra()->sync($request->input('mitra_id', []));
@@ -592,6 +608,52 @@ class KegiatanController extends Controller
         $modelClass = $modelMapping[$jenisKegiatan];
         $validatedData = $request->validated();
         $validatedData['kegiatan_id'] = $idKegiatan;
+
+        // Get type specific fields to identify textareas
+        $typeSpecificFields = $this->getTypeSpecificFields($jenisKegiatan);
+
+        // Define which fields are textareas that need sanitization
+        // This mapping is based on the JS configuration in create.blade.php
+        $textareaFields = [
+            'assessment' => ['assessmentyangterlibat', 'assessmenttemuan', 'assessmenttambahan_ket', 'assessmentkendala', 'assessmentisu', 'assessmentpembelajaran'],
+            'sosialisasi' => ['sosialisasiyangterlibat', 'sosialisasitemuan', 'sosialisasitambahan_ket', 'sosialisasikendala', 'sosialisasiisu', 'sosialisasipembelajaran'],
+            'pelatihan' => ['pelatihanpelatih', 'pelatihanhasil', 'pelatihandistribusi_ket', 'pelatihanrencana', 'pelatihankendala', 'pelatihanisu', 'pelatihanpembelajaran'],
+            'pembelanjaan' => ['pembelanjaandetailbarang', 'pembelanjaanakandistribusi_ket', 'pembelanjaankendala', 'pembelanjaanisu', 'pembelanjaanpembelajaran'],
+            'pengembangan' => ['pengembanganjeniskomponen', 'pengembanganberapakomponen', 'pengembanganlokasikomponen', 'pengembanganyangterlibat', 'pengembanganrencana', 'pengembangankendala', 'pengembanganisu', 'pengembanganpembelajaran'],
+            'kampanye' => ['kampanyeyangdikampanyekan', 'kampanyejenis', 'kampanyebentukkegiatan', 'kampanyeyangterlibat', 'kampanyeyangdisasar', 'kampanyejangkauan', 'kampanyerencana', 'kampanyekendala', 'kampanyeisu', 'kampanyepembelajaran'],
+            'pemetaan' => ['pemetaanyangdihasilkan', 'pemetaanluasan', 'pemetaanunit', 'pemetaanyangterlibat', 'pemetaanrencana', 'pemetaankendala', 'pemetaanisu', 'pemetaanpembelajaran'],
+            'monitoring' => ['monitoringyangdipantau', 'monitoringdata', 'monitoringyangterlibat', 'monitoringmetode', 'monitoringhasil', 'monitoringkegiatanselanjutnya_ket', 'monitoringkendala', 'monitoringisu', 'monitoringpembelajaran'],
+            'kunjungan' => ['kunjunganlembaga', 'kunjunganpeserta', 'kunjunganyangdilakukan', 'kunjunganhasil', 'kunjunganpotensipendapatan', 'kunjunganrencana', 'kunjungankendala', 'kunjunganisu', 'kunjunganpembelajaran'],
+            'konsultasi' => ['konsultasilembaga', 'konsultasikomponen', 'konsultasiyangdilakukan', 'konsultasihasil', 'konsultasipotensipendapatan', 'konsultasirencana', 'konsultasikendala', 'konsultasiisu', 'konsultasipembelajaran'],
+            'lainnya' => ['lainnyamengapadilakukan', 'lainnyadampak', 'lainnyasumberpendanaan', 'lainnyasumberpendanaan_ket', 'lainnyayangterlibat', 'lainnyarencana', 'lainnyakendala', 'lainnyaisu', 'lainnyapembelajaran'],
+        ];
+
+        // Map jenisKegiatan ID to key in $textareaFields
+        $keyMap = [
+            1 => 'assessment',
+            2 => 'sosialisasi',
+            3 => 'pelatihan',
+            4 => 'pembelanjaan',
+            5 => 'pengembangan',
+            6 => 'kampanye',
+            7 => 'pemetaan',
+            8 => 'monitoring',
+            9 => 'kunjungan',
+            10 => 'konsultasi',
+            11 => 'lainnya',
+        ];
+
+        if (isset($keyMap[$jenisKegiatan])) {
+            $currentKey = $keyMap[$jenisKegiatan];
+            $fieldsToSanitize = $textareaFields[$currentKey] ?? [];
+
+            foreach ($fieldsToSanitize as $field) {
+                if (isset($validatedData[$field])) {
+                    $validatedData[$field] = Purifier::clean($validatedData[$field], 'summernote_clean');
+                }
+            }
+        }
+
         $modelClass::create($validatedData);
 
         return response()->json(['message' => 'Kegiatan created successfully'], 201);
@@ -737,6 +799,14 @@ class KegiatanController extends Controller
     {
         try {
             $data = $request->validated();
+
+            // Sanitize summernote fields
+            foreach (self::SUMMERNOTE_FIELDS as $field) {
+                if (isset($data[$field])) {
+                    $data[$field] = Purifier::clean($data[$field], 'summernote_clean');
+                }
+            }
+
             DB::beginTransaction();
 
             // Update main Kegiatan record
@@ -795,6 +865,48 @@ class KegiatanController extends Controller
         $modelClass = $modelMapping[$jenisKegiatan];
         $validatedData = $request->validated();
         $validatedData['kegiatan_id'] = $idKegiatan;
+
+        // Define which fields are textareas that need sanitization
+        // This mapping is based on the JS configuration in create.blade.php
+        $textareaFields = [
+            'assessment' => ['assessmentyangterlibat', 'assessmenttemuan', 'assessmenttambahan_ket', 'assessmentkendala', 'assessmentisu', 'assessmentpembelajaran'],
+            'sosialisasi' => ['sosialisasiyangterlibat', 'sosialisasitemuan', 'sosialisasitambahan_ket', 'sosialisasikendala', 'sosialisasiisu', 'sosialisasipembelajaran'],
+            'pelatihan' => ['pelatihanpelatih', 'pelatihanhasil', 'pelatihandistribusi_ket', 'pelatihanrencana', 'pelatihankendala', 'pelatihanisu', 'pelatihanpembelajaran'],
+            'pembelanjaan' => ['pembelanjaandetailbarang', 'pembelanjaanakandistribusi_ket', 'pembelanjaankendala', 'pembelanjaanisu', 'pembelanjaanpembelajaran'],
+            'pengembangan' => ['pengembanganjeniskomponen', 'pengembanganberapakomponen', 'pengembanganlokasikomponen', 'pengembanganyangterlibat', 'pengembanganrencana', 'pengembangankendala', 'pengembanganisu', 'pengembanganpembelajaran'],
+            'kampanye' => ['kampanyeyangdikampanyekan', 'kampanyejenis', 'kampanyebentukkegiatan', 'kampanyeyangterlibat', 'kampanyeyangdisasar', 'kampanyejangkauan', 'kampanyerencana', 'kampanyekendala', 'kampanyeisu', 'kampanyepembelajaran'],
+            'pemetaan' => ['pemetaanyangdihasilkan', 'pemetaanluasan', 'pemetaanunit', 'pemetaanyangterlibat', 'pemetaanrencana', 'pemetaankendala', 'pemetaanisu', 'pemetaanpembelajaran'],
+            'monitoring' => ['monitoringyangdipantau', 'monitoringdata', 'monitoringyangterlibat', 'monitoringmetode', 'monitoringhasil', 'monitoringkegiatanselanjutnya_ket', 'monitoringkendala', 'monitoringisu', 'monitoringpembelajaran'],
+            'kunjungan' => ['kunjunganlembaga', 'kunjunganpeserta', 'kunjunganyangdilakukan', 'kunjunganhasil', 'kunjunganpotensipendapatan', 'kunjunganrencana', 'kunjungankendala', 'kunjunganisu', 'kunjunganpembelajaran'],
+            'konsultasi' => ['konsultasilembaga', 'konsultasikomponen', 'konsultasiyangdilakukan', 'konsultasihasil', 'konsultasipotensipendapatan', 'konsultasirencana', 'konsultasikendala', 'konsultasiisu', 'konsultasipembelajaran'],
+            'lainnya' => ['lainnyamengapadilakukan', 'lainnyadampak', 'lainnyasumberpendanaan', 'lainnyasumberpendanaan_ket', 'lainnyayangterlibat', 'lainnyarencana', 'lainnyakendala', 'lainnyaisu', 'lainnyapembelajaran'],
+        ];
+
+        // Map jenisKegiatan ID to key in $textareaFields
+        $keyMap = [
+            1 => 'assessment',
+            2 => 'sosialisasi',
+            3 => 'pelatihan',
+            4 => 'pembelanjaan',
+            5 => 'pengembangan',
+            6 => 'kampanye',
+            7 => 'pemetaan',
+            8 => 'monitoring',
+            9 => 'kunjungan',
+            10 => 'konsultasi',
+            11 => 'lainnya',
+        ];
+
+        if (isset($keyMap[$jenisKegiatan])) {
+            $currentKey = $keyMap[$jenisKegiatan];
+            $fieldsToSanitize = $textareaFields[$currentKey] ?? [];
+
+            foreach ($fieldsToSanitize as $field) {
+                if (isset($validatedData[$field])) {
+                    $validatedData[$field] = Purifier::clean($validatedData[$field], 'summernote_clean');
+                }
+            }
+        }
 
         // Update or create the type-specific record
         $modelClass::updateOrCreate(
