@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             KelurahanSeeder::class,
             KaitanSdgSeeder::class,
             PeranSeeder::class,
+            Seed_Master_Jenis_Kegiatan::class,
         ]);
     }
 }

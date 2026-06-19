@@ -35,6 +35,7 @@ class AlwaysSeedDev extends Seeder
             KelurahanSeeder::class,
             KaitanSdgSeeder::class,
             PeranSeeder::class,
+            Seed_Master_Jenis_Kegiatan::class,
 
 
             DusunSeederFaker::class,
